@@ -23,7 +23,8 @@ app.use("/api/toys", require("./routes/toys"));
 app.use("/api/requests", require("./routes/requests"));
 app.use("/api/transactions", require("./routes/transactions"));
 app.use("/api/chats", require("./routes/chats"));
-
+app.use("/api/shopping-cart", require("./routes/shoppingcart"));
+app.use("/api/checkout", require("./routes/Order"));
 // Start server
 const PORT = process.env.PORT || 5003;
 app.listen(PORT, () => {
