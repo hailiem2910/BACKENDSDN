@@ -20,6 +20,7 @@ const toySchema = new mongoose.Schema(
       week: { type: Number, required: true },
       twoWeeks: { type: Number, required: true },
     },
+    fixedPrice: { type: Number, default: null },
     availability: { type: Boolean, default: true },
     is_rentable: { type: Boolean, default: true },
     is_saleable: { type: Boolean, default: true },

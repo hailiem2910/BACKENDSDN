@@ -36,11 +36,12 @@ router.post("/", authMiddleware, async (req, res) => {
     is_rentable,
     is_saleable,
     inventory_count,
-    imageUrl, // Thêm imageUrl vào đây
+    imageUrl,
+    fixedPrice
   } = req.body;
 
   try {
-    const newToy = new Toy({
+    const toyData = {
       name,
       category,
       description,
@@ -50,14 +51,23 @@ router.post("/", authMiddleware, async (req, res) => {
       is_saleable,
       supplier_id: req.user._id,
       inventory_count,
-      imageUrl, // Và đây
-    });
+      imageUrl
+    };
 
+    // Only add fixedPrice if it exists and is_saleable is true
+    if (is_saleable && fixedPrice) {
+      toyData.fixedPrice = fixedPrice;
+    }
+
+    const newToy = new Toy(toyData);
     await newToy.save();
     res.status(201).json(newToy);
   } catch (error) {
-    console.error(error);
-    res.status(400).json({ message: "Failed to create toy", error });
+    console.error('Error creating toy:', error);
+    res.status(400).json({ 
+      message: "Failed to create toy", 
+      error: error.message 
+    });
   }
 });
 
@@ -75,7 +85,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: "Failed to update toy", error });
-  }
+  } 
 });
 
 // Delete a toy

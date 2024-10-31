@@ -1,6 +1,7 @@
 const express = require("express");
 const ShoppingCart = require("../models/ShoppingCart");
 const authMiddleware = require("../middleware/authMiddleware");
+const mongoose = require("mongoose");
 
 const router = express.Router();
 
@@ -48,6 +49,9 @@ router.post("/", authMiddleware, async (req, res) => {
 // Remove an item from the cart
 router.delete("/:itemId", authMiddleware, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.itemId)) {
+      return res.status(400).json({ message: "Invalid item ID format" });
+    }
     const cart = await ShoppingCart.findOne({ user: req.user._id });
     if (!cart) {
       return res.status(404).json({ message: "Shopping cart not found" });
@@ -58,11 +62,38 @@ router.delete("/:itemId", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Item not found in cart" });
     }
 
-    item.remove();
-    await cart.save();
-    res.json({ message: "Item removed from cart" });
+    // item.remove();
+    // await cart.save();
+    console.log('Before removal:', {
+      cartId: cart._id,
+      itemId: req.params.itemId,
+      itemsCount: cart.items.length
+    });
+    
+    await item.removeFromCart();
+    
+    console.log('After removal:', {
+      cartId: cart._id,
+      itemsCount: cart.items.length
+    });
+    res.json({ 
+      success: true,
+      message: "Item removed from cart successfully",
+      removedItemId: req.params.itemId
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Failed to remove item from cart", error });
+    console.error('Cart removal error:', {
+      error: error.message,
+      stack: error.stack,
+      itemId: req.params.itemId
+    });
+    
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to remove item from cart", 
+      error: error.message 
+    });
   }
 });
 

@@ -19,6 +19,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: { type: String, default: "Pending" }, // Order status
     totalAmount: { type: Number, required: true }, // Total amount for the order
+    type: { type: String, required: true }, // New field for type
   },
   { timestamps: true }
 );
